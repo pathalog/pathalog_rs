@@ -1,0 +1,10 @@
+[package]
+name = "pathalog"
+version = "0.0.1"
+authors = ["tupshin"]
+edition = "2018"
+
+[dependencies]
+
+[lib]
+name="pathalog"
