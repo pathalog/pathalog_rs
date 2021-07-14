@@ -4,6 +4,16 @@ pub enum Bit {
     One
 }
 use Bit::*;
+use core::fmt::{Display, Formatter};
+
+impl Display for Bit {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match &self {
+            One =>  write!(f, "One"),
+            Zero =>  write!(f, "Zero")
+        }
+    }
+}
 
 
 pub trait NAnd where Self:Sized+Copy {
