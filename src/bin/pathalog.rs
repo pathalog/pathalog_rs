@@ -1,10 +1,7 @@
-use serde::export::Formatter;
 use std::collections::HashMap;
 use std::fmt;
-use std::fmt::{Debug, Display};
-use std::io::SeekFrom::End;
-#[macro_use]
-extern crate maplit;
+use std::fmt::{Debug, Display, Formatter};
+
 
 type Truth = Option<bool>;
 
@@ -24,25 +21,26 @@ struct Point(POSITION, POSITION);
 /// An Entanglement can be viewed as its own path through its entangled points
 type Entanglement = Vec<(POSITION,POSITION)>;
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 struct Entanglements(Vec<Entanglement>);
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 struct Paths {
     paths: Vec<Path>,
 }
 
 impl Debug for Paths {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        writeln!(f, "");
+        writeln!(f, "").unwrap();
         for (i, path) in &mut self.paths.iter().enumerate() {
-            writeln!(f, "Path {},Length {}", i, path);
+            writeln!(f, "Path {},Length {}", i, path)?
         }
         Ok(())
     }
 }
 
 impl Paths {
+    #[allow(unused)]
     fn join(mut self, mut paths: Paths) -> Self {
         self.paths.append(&mut paths.paths);
         self
@@ -63,7 +61,7 @@ struct Inputs {
 /// edges are added by entangling points on a path.
 /// This is fudamentally equivalent to building up a graph with vertexes
 /// and edges, but encourages one to think in a very different manner
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 struct Universe {
     paths: Paths,
     entanglements: Entanglements,
@@ -72,12 +70,13 @@ struct Universe {
 }
 
 impl Display for Universe {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, _f: &mut Formatter<'_>) -> fmt::Result {
         panic!();
     }
 }
 
 impl Universe {
+    #[allow(unused)]
     fn get_inputs(&mut self, point: &Point) -> Vec<Point> {
         for (k, v) in &self.inputs.inputs.clone() {
             if k == point {
@@ -93,7 +92,7 @@ impl Universe {
         //println!("path inputs: ");
         for (path_idx, path_len) in self.paths.paths.iter().enumerate() {
             self.inputs.inputs.insert(Point(path_idx as u8,*path_len),None);
-            for i in 0..*path_len {
+            for _i in 0..*path_len {
                 self.inputs.inputs.insert(Point(path_idx as u8,*path_len),None);
           //      println!("\t{}:{}", path_idx , *path_len);
             }
@@ -114,7 +113,7 @@ impl Universe {
     fn entanglements(&mut self) -> Vec<Point> {
         //println!("entanglements: ");
         for entangled_path in &self.entanglements.0 {
-            for point in entangled_path {
+            for _point in entangled_path {
             //    print!("=> {}:{}\t",point.0,point.1);
             }
             println!();
@@ -138,16 +137,17 @@ fn main() {
             paths: vec![3,2,3],
         },
         entanglements: Entanglements(vec![vec![(0, 0), (0, 1)]]), //,vec![(1, 2), (1, 1)]]
-        inputs: Inputs{inputs:hashmap!()},
+        inputs: Inputs{inputs:HashMap::default()},
         observations: Observations(vec![]),
     };
+
     //dbg!(&u);
 
-    // for (point, truth) in u.observations.0.clone() {
+    // for (point, truth) in u.observations.clone() {
     //     println!("obs: {:?}, {:?}", point, truth);
     // }
     //
-    // for (point, truth) in u.observations.0.clone() {
+    // for (point, truth) in u.observations.clone() {
     //     u.get_inputs(&point);
     // }
 

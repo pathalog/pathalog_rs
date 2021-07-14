@@ -1,4 +1,3 @@
-#![no_std]
 pub struct Zero;
 pub struct One;
 
@@ -45,7 +44,7 @@ pub trait AND {
     type Q;
 }
 
-//Manually implementing an XOR for performance reasons
+//Manually implementing an AND for performance reasons
 impl AND for (Zero,Zero) {
     type Q = Zero;
 }
@@ -78,7 +77,6 @@ pub type HalfAdder<A,B> = (HalfSum<A,B>,HalfCarry<A,B>);
 pub type HalfSum<A, B> = Xor<A,B>;
 
 pub type HalfCarry<A,B> = And<A,B>;
-//type HalfCarry<A,B> = And<A,B>;
 
 pub type FullSum<A,B,C> = HalfSum<HalfSum<A, B>, C>;
 pub type FullCarry<A,B,C> = HalfSum<HalfCarry<A, B>, HalfCarry<HalfSum<A, B>, C>>;

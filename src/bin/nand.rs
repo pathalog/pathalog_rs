@@ -199,8 +199,6 @@ fn typelevel_tests() {
 }
 
 fn runtime_tests() {
-    use pathalog::nand::runtime::*;
-    use Bit::*;
 
     assert_eq!(Zero.nand(Zero), One);
     assert_eq!(Zero.nand(Zero), One);
@@ -280,7 +278,7 @@ fn runtime_tests() {
     assert_eq!(((One, One).add((One, One))), ((One, Zero)));
 
 
-    //4-bit adder
+    //testing 4-bit adder
     assert_eq!(((One, One, One, One).add((Zero, Zero, Zero, Zero))), ((One, One, One, One)));
     assert_eq!(((One, One, Zero, Zero).add((Zero, Zero, One, One))), ((One, One, One, One)));
     assert_eq!(((One, One, One, One).add((Zero, Zero, Zero, Zero))), ((One, One, One, One)));
@@ -290,7 +288,7 @@ fn runtime_tests() {
     assert_eq!(((One, One, Zero, One).add((Zero, Zero, One, One))), (((Zero, Zero, Zero, Zero))));
     assert_eq!(((One, One, Zero, One).add((One, Zero, One, One))), (((One, Zero, Zero, Zero))));
 
-    //8-bit adder
+    //testing 8-bit adder
     //255+0=255
     assert_eq!(((One, One, One, One, One, One, One, One).add(
         (Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero))),

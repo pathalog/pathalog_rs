@@ -5,6 +5,7 @@ authors = ["tupshin"]
 edition = "2018"
 
 [dependencies]
-
+serde = "1.0.126"
+petgraph = "0.6.0"
 [lib]
 name="pathalog"
