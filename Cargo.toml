@@ -5,8 +5,6 @@ authors = ["tupshin"]
 edition = "2018"
 
 [dependencies]
-maplit = "1.0.2"
-serde = "1.0.118"
 
 [lib]
 name="pathalog"
