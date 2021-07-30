@@ -4,6 +4,22 @@ pub enum Bit {
     Zero,
     One
 }
+
+impl Bit {
+    pub fn one() -> Self {
+        Self::One
+    }
+
+    pub fn zero() -> Self {
+        Self::Zero
+    }
+}
+
+impl Default for Bit {
+    fn default() -> Self {
+        Bit::zero()
+    }
+}
 use Bit::*;
 
 

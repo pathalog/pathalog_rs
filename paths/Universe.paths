@@ -1,0 +1,242 @@
+; Nandalisp
+
+; parentheses, spaces, and sinqle quotes are reserved as special characters
+; all other printable characters can be used as tokens.
+; if you want to use a reserved character as a symbol, escape it with a backslash.
+; \)
+; \(
+; \
+; \\
+; \'
+; All constructs are expressed as lists
+; All lists are sequences
+; All sequences are iterators
+; The first token will produce a list of the subsequent tokens.
+; Or, in other words, the head is the token that represents/produces the tail
+; by convention, we use lower case for concrete values and upper case for abstract
+; types who's value has not been determined
+
+; if a token in a list has not already been introducted (at the top level of a list), it is assumed to be local,
+; and local refernceable within that list
+; if a token has previously been defined at the top level of a list,
+; then using that token in another list is presumed to represent the defined data structure
+
+; the Pipe (|) symbol indicates sequential alternation.
+; While commas (after the initial one) represent nested data structures
+
+; Defines the tokens that we will be using in our system. These one element lists can be considered
+; single value iterators over the label themselves
+(   ()
+    FALSE TRUE
+    0 1 2 3 4 5 6 7 8 9
+    a b c d e f g h i j k l m n o p q r s t u v w x y z
+    A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+)
+
+
+
+; Defines a BOOL token/struct such that asking for a bool will return a sequence that is first false then true
+(BOOL FALSE TRUE)
+
+; Same for bit. Asking for a BIT will return a 0 then a 1, in that order
+(BIT 0 1)
+
+; Note that because BOOL and BIT have structural identity (they both contain two non repeating tokens and nothing else)
+; they are effectively aliases for each other, and a BOOL:true is the same as a BIT:1, in that they both represent
+; the second value in types that contain exactly two values. This is by design and should not be a surprise
+
+; Asking for a Digit will return digits between 0 and 9, in order, one at a time
+(DIGIT 0 1 2 3 4 5 6 7 8 9)
+; Let's create an alias for a digit. Note that any single character token can be combined with
+; other single character tokens into a sequence without including spaces or repeating the identifier
+(# DIGIT)
+
+(LETTER A B C D E F G H I J K L M N O P Q R S T U V W X Y Z)
+(UC LETTER)
+(LC a b c d e f g h i j k l m n o p q r s t u v w x y z)
+
+; We can now specify a multi-digit number as #3452
+(#3452) ; Though we don't yet have much we can do with things like this. This is a path of length one
+        ; representing position 3452 on the path of natural numbers
+
+; All constructs are expressed as lists
+; All lists are sequences
+; All sequences are iterators
+; The first token will produce a list of the subsequent tokens.
+; Or, in other words, the head is the token that represents/produces the tail
+; by convention, we use lower case for concrete values and upper case for abstract
+; types who's value has not been determined
+
+; if a token in a list has not already been introducted (at the top level of a list), it is assumed to be local,
+; and local refernceable within that list
+; if a token has previously been defined at the top level of a list,
+; then using that token in another list is presumed to represent the defined data structure
+
+; the Pipe (|) symbol indicates sequential alternation.
+; While commas (after the initial one) represent nested data structures
+
+
+; Defines a BOOL token/struct such that asking for a bool will return a sequence that is first false then true
+; path-length 2
+(BOOL FALSE TRUE)
+
+; Same for bit. Asking for a BIT will return a 0 then a 1, in that order
+; path-length 2
+(BIT 0 1)
+
+; Note that because BOOL and BIT have structural identity (they both contain two non repeating tokens and nothing else)
+; they are effectively aliases for each other, and a BOOL:true is the same as a BIT:1, in that they both represent
+; the second value in types that contain exactly two values. This is by design and should not be a surprise
+
+; Asking for a Digit will return digits between 0 and 9, in order, one at a time
+; path length 10
+(DIGIT 0 1 2 3 4 5 6 7 8 9)
+
+; a PAIR is a nested set of two BITs. path length 4
+(PAIR BIT BIT)
+(TRIPLE BIT BIT BIT) ; path length 8
+;a Triple can also be expressed as the combination of a PAIR and a BIT, if it is helpful
+(TRIPLE PAIR BIT) ; same because same path bit sequence
+(TRIPLE BIT PAIR) ; same because same path bit sequence
+
+;Asking for a BYTE will return a BIT, containing a second Bit, repeatedly until 8 bits have been produced.
+; path length 256
+(BYTE BIT BIT BIT BIT BIT BIT BIT BIT)
+
+; Asking for a two digit number will return one DIGIT followed by another DIGIT
+; path length 100
+(TWODIGITNUM DIGIT DIGIT)
+
+; Asking for a bignum will return a sequence of 16 digits; path length 10^16
+(BIGNUM DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT)
+
+; previously defined (multi-valued) data types function as wholes/inputs into the DAGs that can be constructed from these lists
+; If you ask for a NAND, you will get two nested bits of input, representing four possible states,
+; and the combination of those two bits will generate one of two outputs
+; The head is two nested bits. The tail is a four token sequence. The fact that there are fewer distinct
+; output values (2) than distinct input values (4), means that this operation will not be reversible once evaluated/flattened
+ (NAND PAIR 1 1 1 0)
+
+; NOT can be defined as the input sequence 0|1 producing the output sequence 1|0
+(NOT BIT 1 0)
+; As a convenience, we introduce one more bit of syntax.
+; in an expression, a TOKEN followed by :# where # is a number binds those inputs to be the same value,
+; even if they appear in different places
+; NOT can then be defined in terms of NAND
+; here we redefine NOT so that it produces a NAND where both inputs must be the same, leading to two input possibilities,
+; and the output toeksn
+; For all possibile inputs, the two NOT definitions produce identical output
+
+; AND is defined with an inverse truth table as NAND
+; AND can be defined in terms of  NAND and NOT
+(AND PAIR 0 0 0 1)
+(AND NOT NAND PAIR)
+
+; As long as all definitions of a token can be proven to generate identical output for all inputs,
+; they can be substituted for each other at the compiler's discretion. If their definitions conflict and produce differing output,
+; or have different input structure, then a compile error occurs
+
+(OR PAIR 0 1 1 1 )
+(OR
+    NAND(NOT(PAIR:0) NOT(PAIR:1))
+)
+
+; valid because OR simplifies into another version of OR
+(OR PAIR (NOT(PAIR:0) NOT(PAIR:1)))
+
+; NOR, defined either natively, or in terms of NOT and OR
+(NOR PAIR 1 0 0 0)
+(NOR NOT(OR(PAIR)))
+
+(XOR PAIR 0 1 1 0)
+(XOR
+    PAIR
+    AND(NAND(PAIR) OR(PAIR))
+)
+
+(XNOR PAIR 1 0 0 1)
+(XNOR
+    PAIR
+    NOT(XOR(PAIR)))
+
+(HALFCARRY AND PAIR)
+
+(HALFADDER
+    (HALFSUM PAIR)
+    (HALFCARRY PAIR)
+)
+
+(FULLSUM
+    HALFSOME(HALFSOME(PAIR) BIT)
+)
+
+
+
+
+
+; a PAIR is a sequence of two BITs and represents a path-length (number of permutations) of 4
+(PAIR BIT BIT)
+; a TRIPLE is a sequence of three BITs, path-length 8
+(TRIPLE BIT BIT BIT)
+; a NIBBLE is a sequence of four BITs. path-length 16
+(NIBBLE BIT BIT BIT BIT);
+;a BYTE is a sequence of 8 BITS. path-length 256
+(BYTE BIT BIT BIT BIT BIT BIT BIT BIT)
+;a BYTE can also be identically defined in terms of two NIBBLES. identical because it has an identical
+;path length to the previous definition
+(BYTE NIBBLE NIBBLE)
+
+; Asking for a two digit number will return one DIGIT followed by another DIGIT
+(TWODIGITNUM DIGIT DIGIT)
+
+; Asking for a bignum will return a sequence of 16 digits
+(BIGNUM DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT DIGIT)
+
+; previously defined (multi-valued) data types function as wholes/inputs into the DAGs that can be constructed from these lists
+; If you ask for a NAND, you will get two nested bits of input, representing four possible states,
+; and the combination of those two bits will generate one of two outputs
+; The head is two nested bits. The tail is a four token sequence. The fact that there are fewer distinct
+; output values (2) than distinct input values (4), means that this operation will not be reversible once evaluated/flattened
+ (NAND PAIR 1 1 1 0)
+
+; NOT can be defined as the input sequence 0|1 producing the output sequence 1|0
+(NOT PAIR 1 0)
+(NOT BIT (NAND BIT BIT))
+; As a convenience, we introduce one more bit of syntax.
+; in an expression, a TOKEN followed by :# where # is a number binds those inputs to be the same value,
+; even if they appear in different places
+; NOT can then be defined in terms of NAND
+; here we redefine NOT so that it produces a NAND where both inputs must be the same, leading to two input possibilities,
+; and the output toeksn
+; For all possibile inputs, the two NOT definitions produce identical output
+
+; AND is defined with an inverse truth table as NAND
+; AND can be defined in terms of  NAND and NOT
+(AND PAIR 0 0 0 1)
+(AND PAIR (BIT 1 0))
+
+; As long as all definitions of a token can be proven to generate identical output for all inputs,
+; they can be substituted for each other at the compiler's discretion. If their definitions conflict and produce differing output,
+; or have different input structure, then a compile error occurs
+
+(OR PAIR 0 1 1 1 )
+; valid because OR simplifies into another version of OR
+(OR PAIR NAND(NOT(:0) NOT(:1)))
+
+
+; NOR, defined either natively, or in terms of NOT and OR
+(NOR PAIR 1 0 0 0)
+(NOR PAIR NOT OR )
+
+(XOR PAIR 0 1 1 0)
+(XOR PAIR AND((NAND :) (OR :)))
+
+(XNOR PAIR 1 0 0 1)
+(XNOR PAIR NOT XOR))
+
+(HALFCARRY AND)
+
+(HALFADDER (HALFSUM) (HALFCARRY)))
+
+(FULLSUM HALFSOME(HALFSOME(PAIR) BIT))
+

@@ -27,6 +27,12 @@ pub trait XOR {
     type Q;
 }
 
+
+// pub trait Nibble {}
+// impl NAND for (Nibble,Nibble) {
+//     type Q = ();
+// }
+
 //Manually implementing an XOR for performance reasons
 impl XOR for (Zero,Zero) {
     type Q = Zero;
@@ -119,6 +125,8 @@ pub type ADD4<A0,A1,A2,A3,B0,B1,B2,B3> = (
 
 
 
+
+
 // pub fn adder() {}
 //
 // fn foo() {
@@ -139,6 +147,7 @@ pub type Add8<A0,A1,A2,A3,A4,A5,A6,A7,B0,B1,B2,B3,B4,B5,B6,B7,> = (
     FullSum<A6,B6,FullCarry<A7,B7,Zero>>,
     HalfSum<A7,B7>,
 );
+
 
 pub type Add16<A0,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,B0,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,B11,B12,B13,B14,B15> = (
     FullSum<A0,B0,FC<A1,B1,FC<A2,B2,FC<A3,B3,FC<A4,B4,FC<A5,B5,FC<A6,B6,FC<A7,B7,FC<A8,B8,FC<A9,B9,FC<A10,B10,FC<A11,B11,FC<A12,B12,FC<A13,B13,FC<A14,B14,FC<A15,B15,Zero>>>>>>>>>>>>>>>>,
