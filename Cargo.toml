@@ -5,6 +5,8 @@ authors = ["tupshin"]
 edition = "2018"
 
 [dependencies]
+lexpr = "0.2.5"
+log = "0.4.14"
 
 [lib]
 name="pathalog"

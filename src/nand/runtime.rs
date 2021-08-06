@@ -53,6 +53,7 @@ pub trait NAnd where Self:Sized+Copy {
 }
 
 
+
 impl NAnd for Bit {
     fn nand(self, other: Self) -> Self {
         match (self, other) {
