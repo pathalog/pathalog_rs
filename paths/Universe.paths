@@ -1,19 +1,7 @@
-; The first token in a lisp is the label/name of this list
-; This self-describing token is visible to its parent (the file its defined in) as well as any sub-universes
-; but is not available outside of it
 
 (
 Universe
 ; Nandalisp
-;
-; parentheses, spaces, and sinqle quotes are reserved as special characters
-; all other printable characters can be used as tokens.
-; if you want to use a reserved character as a symbol, escape it with a backslash.
-; \)
-; \(
-; \
-; \\
-; \'
 ; All constructs are expressed as lists
 ; All lists are sequences
 ; All sequences are iterators
@@ -30,7 +18,7 @@ Universe
 ; the Pipe (|) symbol indicates sequential alternation.
 ; While commas (after the initial one) represent nested data structures
 ;
-; Defines the tokens that we will be using in our Univser. These one element lists can be considered
+; Defines the tokens that we will be using in our Universe. These one element lists can be considered
 ; single value iterators over the labels themselves
 
 FALSE TRUE
