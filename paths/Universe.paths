@@ -1,7 +1,36 @@
-
 (
 Universe
 ; Nandalisp
+; The most primitive version of NandaLisp can be represented just by parenetheses and periods.
+; () represents the empty set, or nothingness
+; . represents a non empty set consisting of itself
+; In any list, the first element represents the head, which is substitutable with the tail
+; i.e. head implies tail
+; This substitution is all we need to build up arbitrarily complex structures
+; The fundamental rules of our Nandalisp universe
+( ( () () ) .  ) ; Two nothings are equivalent to one something
+( ( () .  ) () ) ; A nothing and a something are equivalent to nothing
+( (  . () ) () ) ; A something and a nothing is also an alias for nothing
+( ( .   . ) () ) ; Two somethings are an alias for nothing
+
+; We can introduce new tokens only at the head of a list.
+; This token can be used as an alias from the parent universe/module
+( FALSE () ) ; Nothing can be aliased as FALSE
+( TRUE . )   ; Something can be alias as TRUE
+( 0 FALSE )  ; A zero is equivalent to falseness/nothing
+( 1 TRUE )   ; A one is equivalent to truth/something
+; When there is more than element in the tail, the tail elements are considered to be nested within each other
+( BIT 0 1 )   ; A bit can represent either nothing or something
+; Is equivalent to (BIT ( 0 ( 1 )))
+; Can be read as "BIT is an alias for a sequence that starts with zero and contains a one"
+; Can also be read as "BIT implies zero which implies one"
+; Can also be read as "BIT contains a zero which contains a one"
+
+( PAIR BIT BIT) ; Two nested bits form a pair
+( TRIPLE PAIR BIT) ; A triple is three bits
+( NIBBLE PAIR PAIR) ; A nibble is four bits
+( BYTE NIBBLE NIBBLE) ;A byte is 8 bits
+
 ; All constructs are expressed as lists
 ; All lists are sequences
 ; All sequences are iterators
@@ -21,10 +50,35 @@ Universe
 ; Defines the tokens that we will be using in our Universe. These one element lists can be considered
 ; single value iterators over the labels themselves
 
-FALSE TRUE
-0 1 2 3 4 5 6 7 8 9
-a b c d e f g h i j k l m n o p q r s t u v w x y z
-A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+
+
+; As we've seen above, two list elements delimited by white space are considered to be nested within each
+; other, creating a two dimensional space. This is equivalent to a product type, so multiplication can be
+; considered as a default implicit operator
+
+;In contrast, sometimes we need to concatenate two lists, and hence need a sum type
+; https://en.wikipedia.org/wiki/Algebraic_data_type
+( 2 1|1) ; a two represents a sequence of length two (one and one)
+( 3 2|1) ; three can be defined as a sequence of length two followed by a sequence of length 1
+( 4 3|1) ; etc
+( 5 4|1)
+( 6 5|1)
+( 7 6|1)
+( 8 7|1)
+( 9 8|1)
+
+
+( a . ) ; A represents the first alphabetic character, so is also length one
+( b a|. ); B as the second character is one element longer than A
+; same as ( b
+( c b|. )
+( d b|. )
+
+    a b c d e f g h i j k l m n o p q r s t u v w x y z
+    A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+
+; We have now introduced 64 tokens (2+10+26+26) at the "top level" of our DefaultUniverse
+; These tokens have not been defined yet, so do not yet expand into anything. That's because
 
 ; Defines a BOOL token/struct such that asking for a bool will return a sequence that is first false then true
 ; Because we introduced FALSE and TRUE as top level (to this universe) tokens right above, any usage of that token will be refencing the top level one
@@ -32,46 +86,38 @@ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 ; path-length 2
 (BOOL FALSE TRUE)
 
-; Same for bit. Asking for a BIT will return a 0 then a 1, in that order
-(BIT 0 1)
-(BIT BOOL) ; This should be a synonym for above, due to structural identity
 
 ; Note that because BOOL and BIT have structural equivalency (they both contain two non repeating tokens and nothing else)
 ; they are effectively aliases for each other, and a BOOL:true is the same as a BIT:1, in that they both represent
 ; the second value in types that contain exactly two values. This is by design and should not be a surprise
 
 ; Asking for a Digit will return digits between 0 and 9, in order, one at a time
-(DIGIT 0 1 2 3 4 5 6 7 8 9)
-; Let's create an alias for a digit. Note that any single character token can be combined with
-; other single character tokens into a sequence without including spaces or repeating the identifier
-;(# DIGIT)
+(BASE_10_DIGIT 0 1 2 3 4 5 6 7 8 9)
+; If we ask for a Digit, it will be a base 10 representation.
+(DIGIT BASE_10_DIGIT)
 
 (UPPERCASE_LETTER A B C D E F G H I J K L M N O P Q R S T U V W X Y Z)
 (LETTER UPPERCASE_LETTER)
 (LOWERCASER_LETTER a b c d e f g h i j k l m n o p q r s t u v w x y z)
 
 
-; All constructs are expressed as lists
-; All lists are sequences
-; All sequences are iterators
-; The first token will produce a list of the subsequent tokens.
-; Or, in other words, the head is the token that represents/produces the tail
-; by convention, we use lower case for concrete values and upper case for abstract
-; types who's value has not been determined
+; The 32 ASCII control characters
+(ASCII_CONTROL_CHAR NUL SOH STX ETX EOT ENQ ACK BEL BS HT LF VT FF CR SO SI DLE
+            DC1 DC2 DC3 DC4 SYN ETB CAN EM SUB ESC FS  GS RS US)
+;
+(ASCII_PRINTABLE_CHAR ' ' ! '"' '#' '$' '%' '&' \' '(' ')' '*' '+' ',' '-' '.' '/'
+                      + DIGIT
+                      ':' ';' '<' '=' '>' '?' '@'
+                      + UPPERCASE_LETTER
+                      '[' '\' ']' '^' '_' '`'
+                      + LOWERCASE_LETTER +
+                      '{' '|' '}' '~' 'DEL';
+)
 
-; if a token in a list has not already been introducted (at the top level of a list), it is assumed to be local,
-; and local refernceable within that list
-; if a token has previously been defined at the top level of a list,
-; then using that token in another list is presumed to represent the defined data structure
 
 
-; Note that because BOOL and BIT have structural identity (they both contain two non repeating tokens and nothing else)
-; they are effectively aliases for each other, and a BOOL:true is the same as a BIT:1, in that they both represent
-; the second value in types that contain exactly two values. This is by design and should not be a surprise
 
-; Asking for a Digit will return digits between 0 and 9, in order, one at a time
-; path length 10
-(DIGIT 0 1 2 3 4 5 6 7 8 9)
+
 
 ; a PAIR is a nested set of two BITs. path length 4
 (PAIR BIT BIT)
@@ -99,6 +145,7 @@ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 ; and the combination of those two bits will generate one of two outputs
 ; The head is two nested bits. The tail is a four token sequence. The fact that there are fewer distinct
 ; output values (2) than distinct input values (4), means that this operation will not be reversible once evaluated/flattened
+
  (NAND PAIR 1 1 1 0)
 
 ; NOT can be defined as the input sequence 0|1 producing the output sequence 1|0
