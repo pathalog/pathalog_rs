@@ -8,17 +8,27 @@ Universe
 ; i.e. head implies tail
 ; This substitution is all we need to build up arbitrarily complex structures
 ; The fundamental rules of our Nandalisp universe
-( ( () () ) .  ) ; Two nothings are equivalent to one something
-( ( () .  ) () ) ; A nothing and a something are equivalent to nothing
-( (  . () ) () ) ; A something and a nothing is also an alias for nothing
-( ( .   . ) () ) ; Two somethings are an alias for nothing
+; Because these operations act on two inputs, they are evaluated at the intersection of perpendicular dimensions
+; ( (()()) . ) ; Two nothings are equivalent to one something
+; ( (().) () ) ; A nothing and a something are equivalent to nothing
+; ( (.()) () ) ; A something and a nothing is also an alias for nothing
+; ( (..) () ) ; Two somethings are an alias for nothing
+
+; but because that's not particularly easy to read, nor is it proper s-expression form, so we pretend
+; we've added these aliases
+; ( 0 () )  ; A zero is equivalent to falseness/nothing
+; ( 1 . )   ; A one is equivalent to truth/something
+; so the above can be written as
+( (0 0) 1 ) ; Two nothings are equivalent to one something
+( (0 1) 0 ) ; A nothing and a something are equivalent to nothing
+( (1 0) 0 ) ; A something and a nothing is also an alias for nothing
+( (1 1) 0 ) ; Two somethings are an alias for nothing
+; which is an obvious encoding of the NAND truth table, and provides the basic syntax of our language
 
 ; We can introduce new tokens only at the head of a list.
 ; This token can be used as an alias from the parent universe/module
-( FALSE () ) ; Nothing can be aliased as FALSE
-( TRUE . )   ; Something can be alias as TRUE
-( 0 FALSE )  ; A zero is equivalent to falseness/nothing
-( 1 TRUE )   ; A one is equivalent to truth/something
+( FALSE 0 ) ; Nothing can be aliased as FALSE
+( TRUE 1 )   ; Something can be alias as TRUE
 ; When there is more than element in the tail, the tail elements are considered to be nested within each other
 ( BIT 0 1 )   ; A bit can represent either nothing or something
 ; Is equivalent to (BIT ( 0 ( 1 )))
@@ -26,10 +36,10 @@ Universe
 ; Can also be read as "BIT implies zero which implies one"
 ; Can also be read as "BIT contains a zero which contains a one"
 
-( PAIR BIT BIT) ; Two nested bits form a pair
-( TRIPLE PAIR BIT) ; A triple is three bits
-( NIBBLE PAIR PAIR) ; A nibble is four bits
-( BYTE NIBBLE NIBBLE) ;A byte is 8 bits
+( PAIR BIT BIT) ; Two nested bits form a pair. This forms a two dimensional field, each of length 2
+( TRIPLE PAIR BIT) ; A triple is three bits. Three dimensional field
+( NIBBLE PAIR PAIR) ; A nibble is four bits. Four diemnsional field
+( BYTE NIBBLE NIBBLE) ;A byte is 8 bits. 8 Dimensional field, consisting of 256 unique positions
 
 ; All constructs are expressed as lists
 ; All lists are sequences
@@ -44,38 +54,85 @@ Universe
 ; if a token has previously been defined at the top level of a list,
 ; then using that token in another list is presumed to represent the defined data structure
 ;
-; the Pipe (|) symbol indicates sequential alternation.
-; While commas (after the initial one) represent nested data structures
-;
-; Defines the tokens that we will be using in our Universe. These one element lists can be considered
-; single value iterators over the labels themselves
 
 
 
 ; As we've seen above, two list elements delimited by white space are considered to be nested within each
 ; other, creating a two dimensional space. This is equivalent to a product type, so multiplication can be
 ; considered as a default implicit operator
-
-;In contrast, sometimes we need to concatenate two lists, and hence need a sum type
 ; https://en.wikipedia.org/wiki/Algebraic_data_type
-( 2 1|1) ; a two represents a sequence of length two (one and one)
-( 3 2|1) ; three can be defined as a sequence of length two followed by a sequence of length 1
-( 4 3|1) ; etc
-( 5 4|1)
-( 6 5|1)
-( 7 6|1)
-( 8 7|1)
-( 9 8|1)
+
+; Conceptualy, a product involves laying two things perpendicular to each other, creating a field
+; In contrast, sometimes we need to concatenate two lists, and hence need a sum type
+; Just as a product type creates a field, a sum type just extends an existing dimension, by aligning the operands
+; Above we defined 1, as equivalent to truth. Using that as our building blocks, we construct the rest of the
+; base 10 digits
+
+( 2 1+1) ; a two represents a sequence of length two (one and one)
+( 3 2+1) ; three can be defined as a sequence of length two followed by a sequence of length 1
+( 4 3+1) ; etc
+( 5 4+1)
+( 6 5+1)
+( 7 6+1)
+( 8 7+1)
+( 9 8+1)
 
 
-( a . ) ; A represents the first alphabetic character, so is also length one
-( b a|. ); B as the second character is one element longer than A
-; same as ( b
-( c b|. )
-( d b|. )
+( a 1 ) ; A represents the first alphabetic character, so is also length one
+( b a+1 ); B as the second character is one element longer than A
+( c b+1 )
+( d c+1 )
+;We can introduce ++ as an alias for +1
+(++ + 1)
+(e d++)
+(f e++)
+(g f++)
+(h g++)
+(i h++)
+(j i++)
+(k j++)
+(l k++)
+(m l++)
+(n m++)
+(o n++)
+(p o++)
+(q p++)
+(r q++)
+(s r++)
+(t s++)
+(u t++)
+(v u++)
+(w v++)
+(x w++)
+(y x++)
+(z y++)
 
-    a b c d e f g h i j k l m n o p q r s t u v w x y z
-    A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+(A 1)
+(B A++)
+(C B++)
+(D C++)
+(E D++)
+(F E++)
+(G F++)
+(H G++)
+(I G++)
+(J I++)
+(K K++)
+(L L++)
+(M L++)
+(N M++)
+(O N++)
+(P O++)
+(Q P++)
+(R Q++)
+(S R++)
+(T S++)
+(U T++)
+(V U++)
+(W V++)
+(X W++)
+(U X++)
+(Z Y++)
 
 ; We have now introduced 64 tokens (2+10+26+26) at the "top level" of our DefaultUniverse
 ; These tokens have not been defined yet, so do not yet expand into anything. That's because
@@ -105,14 +162,14 @@ Universe
 (ASCII_CONTROL_CHAR NUL SOH STX ETX EOT ENQ ACK BEL BS HT LF VT FF CR SO SI DLE
             DC1 DC2 DC3 DC4 SYN ETB CAN EM SUB ESC FS  GS RS US)
 ;
-(ASCII_PRINTABLE_CHAR ' ' ! '"' '#' '$' '%' '&' \' '(' ')' '*' '+' ',' '-' '.' '/'
-                      + DIGIT
-                      ':' ';' '<' '=' '>' '?' '@'
-                      + UPPERCASE_LETTER
-                      '[' '\' ']' '^' '_' '`'
-                      + LOWERCASE_LETTER +
-                      '{' '|' '}' '~' 'DEL';
-)
+;(ASCII_PRINTABLE_CHAR ' ' ! '"' '#' '$' '%' '&' '\\\'' '(' ')' '*' '+' ',' '-' '.' '/'
+;                      + DIGIT
+;                      ':' ';' '<' '=' '>' '?' '@'
+;                      + UPPERCASE_LETTER
+;                      '[' '\' ']' '^' '_' '`'
+;                      + LOWERCASE_LETTER +
+;                      '{' '|' '}' '~' 'DEL';
+;)
 
 
 

@@ -44,6 +44,7 @@ impl Iterator for Path {
     }
 }
 
+
 impl Path {
     fn len(&self) -> usize {
         self.1.len()
@@ -114,23 +115,15 @@ impl Path {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let u = Path::new(lexpr::from_str(&fs::read_to_string(
+    let mut u:Vec<Path> = Path::new(lexpr::from_str(&fs::read_to_string(
         "paths/Universe.paths",
     )?)?)
-    .unwrap();
-
-    // let u = Universe {
-    //     label: "foou".to_string(),
-    //     contents: vec![],
-    // };
-    //   u.print_tokens();
-    //println!("{}", u);
+    .unwrap().collect();
+    u.reverse();
 
     for path in u {
       println!("{}", path)
     }
-
-
     Ok(())
 
 }
