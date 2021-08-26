@@ -68,18 +68,18 @@ Universe
 ; Above we defined 1, as equivalent to truth. Using that as our building blocks, we construct the rest of the
 ; base 10 digits
 
-( 2 1+1) ; a two represents a sequence of length two (one and one)
-( 3 2+1) ; three can be defined as a sequence of length two followed by a sequence of length 1
-( 4 3+1) ; etc
-( 5 4+1)
-( 6 5+1)
-( 7 6+1)
-( 8 7+1)
-( 9 8+1)
+( 2 1 + 1) ; a two represents a sequence of length two (one and one)
+( 3 2 + 1) ; three can be defined as a sequence of length two followed by a sequence of length 1
+( 4 3 + 1) ; etc
+( 5 4 + 1)
+( 6 5 + 1)
+( 7 6 + 1)
+( 8 7 + 1)
+( 9 8 + 1)
 
 
-( a 1 ) ; A represents the first alphabetic character, so is also length one
-( b a+1 ); B as the second character is one element longer than A
+( a 0 ) ; A represents the first alphabetic character, so is also length one
+( b a ); B as the second character is one element longer than A
 ( c b+1 )
 ( d c+1 )
 ;We can introduce ++ as an alias for +1

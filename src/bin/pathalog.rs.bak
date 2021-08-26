@@ -132,7 +132,7 @@ fn main() {
     //
     // paths1.0.append(&mut paths2.0);
     //
-    let mut not = Universe {
+    let mut nand_U = Universe {
         paths: Paths {
             paths: vec![3,2,3],
         },
@@ -151,9 +151,9 @@ fn main() {
     //     u.get_inputs(&point);
     // }
 
-    not.path_inputs();
-    not.path_outputs();
-    not.entanglements();
+    nand_U.path_inputs();
+    nand_U.path_outputs();
+    nand_U.entanglements();
 
     println!("{:?}", not.paths);
     println!("{:?}", not.inputs);

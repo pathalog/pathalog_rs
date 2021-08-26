@@ -1,40 +1,32 @@
-use lexpr::cons::ListIter;
-use lexpr::parse;
 use lexpr::Value;
-use log::debug;
-use std::collections::HashMap;
 use std::error::Error;
-use std::fmt::{Debug, Display, Formatter};
+use std::fmt;
+use std::fmt::{Debug, Display, Formatter, Write};
 use std::fs;
 use std::io;
 
-//A Path is defined by its own Label (String) and its contents (Vec<Path>)
 #[derive(Debug, Clone)]
 struct Path(String, Vec<Path>);
 
 impl Display for Path {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} (", self.0)?;
+        write!(f, "{} ", self.0)?;
         match self.1.is_empty() {
             true => {
-                write!(f, " \n")
+                write!(f, "\n")
             }
             false => {
-                write!(f, "");
+                write!(f, "=> ")?;
+                let mut output = String::new();
                 for u in self.1.clone() {
-                    &u.innerfmt(f, 1)?;
-                    if u.len() > 0 {
-                        //writeln!(f, "")?;
-                    } else {
-                        //writeln!(f, " => {}", 0)?;
-                    }
+                    &mut output.push_str(&u.innerfmt(1)?);
                 }
+                write!(f, "( {})", output)?;
                 Ok(())
             }
         }
     }
 }
-
 
 impl Iterator for Path {
     type Item = Path;
@@ -44,41 +36,17 @@ impl Iterator for Path {
     }
 }
 
-
 impl Path {
-    fn len(&self) -> usize {
-        self.1.len()
-    }
-
-    fn variants(&self) -> usize {
-        let mut variants = 1;
-        for item in self.1.clone() {
-            variants = variants * item.len()+1
-        }
-        1
-    }
-
-    fn innerfmt(&self, f: &mut Formatter<'_>, depth: usize) -> std::fmt::Result {
-        write!(f, " {}", self.0)?;
+    fn innerfmt(&self, _depth: usize) -> Result<String, fmt::Error> {
+        let mut output = String::new();
         match self.1.is_empty() {
             true => {
-                write!(f, " )");
-                Ok(())
-            },
+                write!(&mut output, "{} ", self.0)?;
+                Ok(output)
+            }
             false => {
-                write!(f, " (");
-                for u in self.1.clone() {
-                    &u.innerfmt(f, depth + 1)?;
-                }
-                match self.1.is_empty() {
-                    true => write!(f, ""),
-                    false => write!(f, "( "),
-                }?;
-                write!(f, "");
-                // if depth < 2 {
-                //     write!(f, " => {}", self.1.len())?;
-                // }
-                Ok(())
+                write!(output, "( ")?;
+                Ok(output)
             }
         }
     }
@@ -99,31 +67,26 @@ impl Path {
                     Path(item.car().to_string(), contents.into_iter().collect())
                 }
                 Value::Vector(_) => unimplemented!(),
-                Value::Bool(b) => unimplemented!(),
-                Value::Char(c) => unimplemented!(),
+                Value::Bool(_) => unimplemented!(),
+                Value::Char(_) => unimplemented!(),
                 Value::String(_) => unimplemented!(),
                 Value::Keyword(_) => unimplemented!(),
                 Value::Bytes(_) => unimplemented!(),
             })
         }
     }
-
-    fn evaluate(&self, value: String) -> Result<(), parse::Error> {
-        let value = lexpr::from_str(&value)?;
-        Ok(())
-    }
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let mut u:Vec<Path> = Path::new(lexpr::from_str(&fs::read_to_string(
+    let mut u: Vec<Path> = Path::new(lexpr::from_str(&fs::read_to_string(
         "paths/Universe.paths",
     )?)?)
-    .unwrap().collect();
+    .unwrap()
+    .collect();
     u.reverse();
 
     for path in u {
-      println!("{}", path)
+        println!("{}", path)
     }
     Ok(())
-
 }
