@@ -45,7 +45,10 @@ impl Path {
                 Ok(output)
             }
             false => {
-                write!(output, "( ")?;
+                write!(output, "( {} )", self.0)?;
+                for path in &self.1 {
+                    &mut output.push_str(&path.innerfmt(1)?);
+                }
                 Ok(output)
             }
         }
@@ -54,7 +57,7 @@ impl Path {
     fn new(sexpr: Value) -> Result<Self, io::Error> {
         {
             Ok(match sexpr.clone() {
-                Value::Nil | Value::Null => Path("".to_string(), vec![]),
+                Value::Nil | Value::Null => Path("()".to_string(), vec![]),
                 Value::Number(n) => Path(n.to_string(), vec![]),
                 Value::Symbol(sym) => Path(sym.to_string(), vec![]),
                 Value::Cons(item) => {
@@ -69,7 +72,7 @@ impl Path {
                 Value::Vector(_) => unimplemented!(),
                 Value::Bool(_) => unimplemented!(),
                 Value::Char(_) => unimplemented!(),
-                Value::String(_) => unimplemented!(),
+                Value::String(string) => Path(string.to_string(), vec![]),
                 Value::Keyword(_) => unimplemented!(),
                 Value::Bytes(_) => unimplemented!(),
             })

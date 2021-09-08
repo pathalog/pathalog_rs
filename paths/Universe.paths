@@ -9,15 +9,15 @@ Universe
 ; This substitution is all we need to build up arbitrarily complex structures
 ; The fundamental rules of our Nandalisp universe
 ; Because these operations act on two inputs, they are evaluated at the intersection of perpendicular dimensions
-; ( (()()) . ) ; Two nothings are equivalent to one something
-; ( (().) () ) ; A nothing and a something are equivalent to nothing
-; ( (.()) () ) ; A something and a nothing is also an alias for nothing
-; ( (..) () ) ; Two somethings are an alias for nothing
+( ( ()() ) + ) ; Two nothings are equivalent to one something
+( ( () +) + ) ; A nothing and a something are equivalent to something
+( ( + () ) + ) ; A something and a nothing is also an alias for something
+( ( + + ) () ) ; Two somethings are a nothing
 
-; but because that's not particularly easy to read, nor is it proper s-expression form, so we pretend
-; we've added these aliases
-; ( 0 () )  ; A zero is equivalent to falseness/nothing
-; ( 1 . )   ; A one is equivalent to truth/something
+; but because that's not particularly easy to read, nor is it proper s-expression form, so we've
+; added these aliases
+( 0 () )  ; A zero is equivalent to falseness/nothing
+( 1 + )   ; A one is equivalent to truth/something
 ; so the above can be written as
 ( (0 0) 1 ) ; Two nothings are equivalent to one something
 ( (0 1) 0 ) ; A nothing and a something are equivalent to nothing
@@ -162,14 +162,14 @@ Universe
 (ASCII_CONTROL_CHAR NUL SOH STX ETX EOT ENQ ACK BEL BS HT LF VT FF CR SO SI DLE
             DC1 DC2 DC3 DC4 SYN ETB CAN EM SUB ESC FS  GS RS US)
 ;
-;(ASCII_PRINTABLE_CHAR ' ' ! '"' '#' '$' '%' '&' '\\\'' '(' ')' '*' '+' ',' '-' '.' '/'
-;                      + DIGIT
-;                      ':' ';' '<' '=' '>' '?' '@'
-;                      + UPPERCASE_LETTER
-;                      '[' '\' ']' '^' '_' '`'
-;                      + LOWERCASE_LETTER +
-;                      '{' '|' '}' '~' 'DEL';
-;)
+(ASCII_PRINTABLE_CHAR " " "!" "\"" "#" "$" "%" "&" "\\" "(" ")" "*" "+" "," "-" "." "/"
+                      + DIGIT
+                      ":" ";" "<" "=" ">" "?" "@"
+                      + UPPERCASE_LETTER
+                      "[" "\\" "]" "^" "_" "`"
+                      + LOWERCASE_LETTER +
+                      "{" "|" "}" "~" "DEL"
+)
 
 
 
@@ -203,11 +203,11 @@ Universe
 ; The head is two nested bits. The tail is a four token sequence. The fact that there are fewer distinct
 ; output values (2) than distinct input values (4), means that this operation will not be reversible once evaluated/flattened
 
- (NAND PAIR 1 1 1 0)
+;(NAND PAIR 1 1 1 0)
 
 ; NOT can be defined as the input sequence 0|1 producing the output sequence 1|0
 (NOT BIT 1 0)
-(NOT (O 1) 1 0)
+;(NOT (O 1) 1 0)
 ; As a convenience, we introduce one more bit of syntax.
 ; in an expression, a TOKEN followed by :# where # is a number binds those inputs to be the same value,
 ; even if they appear in different places
@@ -218,21 +218,21 @@ Universe
 
 ; AND is defined with an inverse truth table as NAND
 ; AND can be defined in terms of  NAND and NOT
-(AND PAIR 0 0 0 1)
-(AND ((0 0) (0 1) (1 0) (1 1)) 0 0 0 1)
-(AND PAIR NAND NOT)
+;(AND PAIR 0 0 0 1)
+;(AND ((0 0) (0 1) (1 0) (1 1)) 0 0 0 1)
+(AND NAND NOT)
 
 ; As long as all definitions of a token can be proven to generate identical output for all inputs,
 ; they can be substituted for each other at the compiler's discretion. If their definitions conflict and produce differing output,
 ; or have different input structure, then a compile error occurs
 
-( OR PAIR 0 1 1 1 )
-( OR ( (0 0) (0 1) (1 0) (1 1) ) 0 1 1 1 )
+;( OR PAIR 0 1 1 1 )
+;( OR ( (0 0) (0 1) (1 0) (1 1) ) 0 1 1 1 )
 ( OR PAIR (NOT NOT) NAND )
 
 ; NOR, defined either natively, or in terms of NOT and OR
 ( NOR PAIR 1 0 0 0 )
-(NOR PAIR OR NOT)
+(NOR OR NOT)
 
 (XOR PAIR 0 1 1 0)
 
