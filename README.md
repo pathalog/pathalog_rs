@@ -18,4 +18,12 @@
 * Labels/Token
   * A label is the same thing as a token. It is a sequence of printable characters.
   * The head of 
-* Iteration 
+* Iteration
+* Evaluation
+  * There is no evaluation, only Observation.
+  * Anything that outputs a result is an observation
+  * Hency all operations are lazy
+* Defn
+  * There are no functions, so no special syntax to define them
+* Symbols are implicitly defined by putting them at the beginning of a list. They are then defined as an alias for the tail of that list
+* Observing a symbol is done (for now, by appending an exclamation to that symbol. That both simplifies the symbol as well as sends it to stdout
