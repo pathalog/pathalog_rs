@@ -134,9 +134,6 @@ Universe
 (U X++)
 (Z Y++)
 
-; We have now introduced 64 tokens (2+10+26+26) at the "top level" of our DefaultUniverse
-; These tokens have not been defined yet, so do not yet expand into anything. That's because
-
 ; Defines a BOOL token/struct such that asking for a bool will return a sequence that is first false then true
 ; Because we introduced FALSE and TRUE as top level (to this universe) tokens right above, any usage of that token will be refencing the top level one
 ; Defines a BOOL token/struct such that asking for a bool will return a sequence that is first false then true
